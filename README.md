@@ -359,61 +359,9 @@ oc patch node $NEW_NODE_NAME --type=merge -p "{\"spec\":{\"providerID\":\"$PROVI
 oc get node $NEW_NODE_NAME -o jsonpath='{.spec.providerID}'
 ```
 
-### 🔐 3.5 Create Required Secrets
 
-Create the BMC credentials secret:
 
-```yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: master-3-bmc-secret
-  namespace: openshift-machine-api
-type: Opaque
-data:
-  username: cm9vdA==  # base64 encoded "root"
-  password: Y2FsdmluIA==  # base64 encoded "calvin"
-```
-
-Create the network configuration secret:
-
-```yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: master-3-network-config-secret
-  namespace: openshift-machine-api
-type: Opaque
-stringData:
-  networkData: |
-    network:
-      version: 2
-      ethernets:
-        eno1:
-          dhcp4: false
-          dhcp6: false
-          addresses:
-            - 192.168.24.89/25
-            - 2600:52:7:24::89/64
-          gateway4: 192.168.24.1
-          gateway6: 2600:52:7:24::1
-          nameservers:
-            addresses:
-              - 192.168.24.80
-              - 2600:52:7:24::80
-          match:
-            macaddress: b8:ce:f6:56:3d:b2
-```
-
-Apply the secrets:
-
-```bash
-# 🚀 Apply the secrets
-oc apply -f master-3-bmc-secret.yaml
-oc apply -f master-3-network-config-secret.yaml
-```
-
-### ✅ 3.6 Validate BMH and Machine Integration
+### ✅ 3.5 Validate BMH and Machine Integration
 
 ```bash
 # 🖥️ Check BareMetalHost status
