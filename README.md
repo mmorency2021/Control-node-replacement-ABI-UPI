@@ -267,20 +267,19 @@ metadata:
   labels:
     installer.openshift.io/role: control-plane
 spec:
-  online: true
-  bootMACAddress: "b8:ce:f6:56:3d:b2"
-  bmc:
-    address: "idrac-virtualmedia://192.168.24.157/redfish/v1/Systems/System.Embedded.1"
-    credentialsName: master-3-bmc-secret
-    disableCertificateVerification: true
-  rootDeviceHints:
-    deviceName: "/dev/disk/by-path/pci-0000:18:00.0-scsi-0:2:1:0"
+ consumerRef:
+    apiVersion: machine.openshift.io/v1beta1
+    kind: Machine
+    name: master-3-replacement
+    namespace: openshift-machine-api
+  customDeploy:
+    method: install_coreos
+  externallyProvisioned: true
+  online: false
   userData:
     name: master-user-data-managed
     namespace: openshift-machine-api
-  networkData:
-    name: master-3-network-config-secret
-    namespace: openshift-machine-api
+
 ```
 
 Apply the BareMetalHost resource:
@@ -305,28 +304,21 @@ metadata:
     machine.openshift.io/cluster-api-machine-role: master
     machine.openshift.io/cluster-api-machine-type: master
 spec:
-  lifecycleHooks: {}
-  metadata:
-    labels:
-      machine.openshift.io/cluster-api-cluster: mno-cu-q6pdq
-      machine.openshift.io/cluster-api-machine-role: master
-      machine.openshift.io/cluster-api-machine-type: master
+  metadata: {}
   providerSpec:
     value:
-      apiVersion: machine.openshift.io/v1alpha1
-      kind: BareMetalMachineProviderSpec
+      apiVersion: baremetal.cluster.k8s.io/v1alpha1
+      customDeploy:
+        method: install_coreos
+      hostSelector: {}
       image:
-        checksum: "http://192.168.24.80:9000/rhcos-4.18.1-x86_64-metal.x86_64.raw.gz.sha256sum"
-        url: "http://192.168.24.80:9000/rhcos-4.18.1-x86_64-metal.x86_64.raw.gz"
+        checksum: ""
+        url: ""
+      kind: BareMetalMachineProviderSpec
+      metadata:
+        creationTimestamp: null
       userData:
         name: master-user-data-managed
-        namespace: openshift-machine-api
-      networkData:
-        name: master-3-network-config-secret
-        namespace: openshift-machine-api
-      hostSelector:
-        matchLabels:
-          installer.openshift.io/role: control-plane
 ```
 
 Apply the Machine resource:
